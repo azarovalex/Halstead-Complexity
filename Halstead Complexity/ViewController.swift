@@ -27,7 +27,7 @@ func browseFile() -> String {
 
 let operatorsList = ["==",">=" ,"<=" ,"+=" ,"-=" ,"++","--", "!=", "[", "until", "=", ".open", ".each", ".now", ".chomp", "when", "if ", ".nil", "+", "-", "*", "/", "<", ">", ".upto", ".length", ".new", "and", "or ", ".call", "while", ".empty?", ".size", ".dup", ".push", ".pop", ".times", ".shuffle", ".write", "puts", "exit", "break", ".capitalize", ".now", ".open", "each_line", ".each_with_index", ".each_index", "break", "case", ".min", ".call", ".empty", "|", "{", "," , "%", "exit", "puts"]
 
-let blackList = ["]", "}", ")", "def", "class"]
+let blackList = ["]", "}", "def"]
 var findedOperators = [String:Int]()
 var findedOperands = [String:Int]()
 class ViewController: NSViewController {
@@ -51,7 +51,7 @@ class ViewController: NSViewController {
     @IBAction func Calculate(_ sender: Any) {
         code = code_textedit.string
         
-        // Delete comments and string in quotes
+        // Delete comments, handles functions and string in quotes
         var lines = code.split(separator: "\n")
         for index in 0..<lines.count {
             if lines[index].contains("#") {
@@ -72,6 +72,14 @@ class ViewController: NSViewController {
                     lines[index] += quotesArray[2]
                 }
             }
+            
+            if lines[index].contains("=") == false && lines[index].contains("(") {
+                var newline = lines[index].split(separator: "(").joined(separator: " ")
+                newline = newline.split(separator: ",").joined(separator: " ")
+                newline = newline.split(separator: ")").joined(separator: " ")
+                let newnewline = newline.split(separator: "≠")
+                lines[index] = newnewline[0]
+            }
         }
         code = lines.joined(separator: "\n")
         
@@ -79,6 +87,14 @@ class ViewController: NSViewController {
         for str in blackList {
             code = code.replacingOccurrences(of: str, with: " ")
         }
+        
+        // Handle function calls
+        let pat = "[a-zA-Z]+\\([^\\)]*\\)"
+        let regex = try! NSRegularExpression(pattern: pat, options: [])
+        let matches = regex.matches(in: code, options: [], range: NSRange(location: 0, length: code.count))
+        print(matches)
+        
+
         
         // Count operators
         code = code.replacingOccurrences(of: "else", with: "")
