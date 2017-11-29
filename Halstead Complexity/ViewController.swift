@@ -32,6 +32,8 @@ var findedOperators = [String:Int]()
 var findedOperands = [String:Int]()
 var numOperators = 0
 var numOperands = 0
+var numOfUniqueOperators = 0
+var numOfUniqueOperands = 0
 
 class ViewController: NSViewController {
     
@@ -69,6 +71,7 @@ class ViewController: NSViewController {
                 lines[index] = quotesArray[0]
                 if quotesArray.count > 1 {
                     let operand = String(quotesArray[1])
+                    numOperands += 1
                     if findedOperands[operand] != nil {
                         findedOperands[operand]! += 1
                     } else { findedOperands[operand] = 1 }
@@ -102,24 +105,47 @@ class ViewController: NSViewController {
             if code.contains(op) {
                 let numOfOper = code.components(separatedBy: op).count - 1
                 findedOperators[op] = numOfOper
+                numOperators = numOperators + numOfOper
                 code = code.replacingOccurrences(of: op, with: " ")
             }
         }
-        code_textedit.string = code
+        
         
         // Count Operands
         let variables = code.split(separator: "\n").joined(separator: " ").split(separator: " ")
         for index in 0..<variables.count {
             let operand = String(variables[index])
+            numOperands += 1
             if findedOperands[operand] != nil {
                 findedOperands[operand]! += 1
             } else { findedOperands[operand] = 1 }
         }
         
-        print(findedOperators.description)
-        print(findedOperands.description)
+        numOfUniqueOperands = findedOperands.count
+        numOfUniqueOperators = findedOperators.count
+        
+        // Display counted numbers
+        n1.stringValue = "\(numOfUniqueOperators)"
+        n2.stringValue = "\(numOfUniqueOperands)"
+        bigN1.stringValue = "\(numOperators)"
+        bigN2.stringValue = "\(numOperands)"
+        
+        // Display list of operator and operands
+        var operatorsDisplay = findedOperators.description.components(separatedBy: ", ").joined(separator: "\n")
+        operatorsDisplay.remove(at: operatorsDisplay.startIndex)
+        operatorsDisplay = operatorsDisplay.substring(to: operatorsDisplay.index(before: operatorsDisplay.endIndex))
+        f1.string = operatorsDisplay
+        var operandsDisplay = findedOperands.description.components(separatedBy: ", ").joined(separator: "\n")
+        operandsDisplay.remove(at: operandsDisplay.startIndex)
+        operandsDisplay = operandsDisplay.substring(to: operandsDisplay.index(before: operandsDisplay.endIndex))
+        f2.string = operandsDisplay
+        
         findedOperands.removeAll()
         findedOperators.removeAll()
+        numOfUniqueOperators = 0
+        numOfUniqueOperands = 0
+        numOperators = 0
+        numOperands = 0
     }
     
     @IBAction func OpenFile(_ sender: Any) {
