@@ -25,8 +25,12 @@ func browseFile() -> String {
     return ""
 }
 
-class ViewController: NSViewController {
+let operatorsList = ["==",">=" ,"<=" ,"+=" ,"-=" ,"++","--", "!=", "[", "until", "=", ".open", ".each", ".now", ".chomp", "when", "if ", ".nil", "+", "-", "*", "/", "<", ">", ".upto", ".length", ".new", "and", "or ", ".call", "while", ".empty?", ".size", ".dup", ".push", ".pop", ".times", ".shuffle", ".write", "puts", "exit", "break", ".capitalize", ".now", ".open", "each_line", ".each_with_index", ".each_index", "break", "case", ".min", ".call", ".empty", "|", "{", "," , "%", "exit", "puts"]
 
+let blackList = ["]", "}", ")", "def", "class"]
+var findedOperators = [String:Int]()
+var findedOperands = [String:Int]()
+class ViewController: NSViewController {
     
     @IBOutlet weak var n1: NSTextField!
     @IBOutlet weak var n2: NSTextField!
@@ -34,15 +38,68 @@ class ViewController: NSViewController {
     @IBOutlet weak var bigN2: NSTextField!
     @IBOutlet var f1: NSTextView!
     @IBOutlet var f2: NSTextView!
-    @IBOutlet var code: NSTextView!
+    @IBOutlet var code_textedit: NSTextView!
+    
     var filePath = ""
+    var code = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        code.font = NSFont(name: "Courier New", size: 13)
+        code_textedit.font = NSFont(name: "Courier New", size: 13)
     }
     
     @IBAction func Calculate(_ sender: Any) {
+        code = code_textedit.string
+        
+        // Delete comments and string in quotes
+        var lines = code.split(separator: "\n")
+        for index in 0..<lines.count {
+            if lines[index].contains("#") {
+                let hashArray = lines[index].split(separator: "#")
+                if hashArray.count > 1 {
+                    lines[index] = hashArray[0]
+                } else { lines[index] = "" }
+            }
+            
+            if lines[index].contains("\"") {
+                let quotesArray = lines[index].split(separator: "\"")
+                lines[index] = quotesArray[0]
+                let operand = String(quotesArray[1])
+                if findedOperands[operand] != nil {
+                    findedOperands[operand]! += 1
+                } else { findedOperands[operand] = 1 }
+                if quotesArray.count > 2 {
+                    lines[index] += quotesArray[2]
+                }
+            }
+        }
+        code = lines.joined(separator: "\n")
+        
+        // Delete all black list crap
+        for str in blackList {
+            code = code.replacingOccurrences(of: str, with: " ")
+        }
+        
+        // Count operators
+        code = code.replacingOccurrences(of: "else", with: "")
+        code = code.replacingOccurrences(of: "end", with: "")
+        for op in operatorsList {
+            if code.contains(op) {
+                let numOfOper = code.components(separatedBy: op).count - 1
+                findedOperators[op] = numOfOper
+                code = code.replacingOccurrences(of: op, with: " ")
+            }
+        }
+        code_textedit.string = code
+        print(findedOperators)
+        print(findedOperands)
+        
+        // Count Operands
+        
+        
+        
+        findedOperands.removeAll()
+        findedOperators.removeAll()
     }
     
     @IBAction func OpenFile(_ sender: Any) {
@@ -50,7 +107,7 @@ class ViewController: NSViewController {
         guard FileManager.default.fileExists(atPath: filePath) else {
             return
         }
-        try! code.string = String.init(contentsOf: URL.init(fileURLWithPath: filePath), encoding: .ascii)
+        try! code_textedit.string = String.init(contentsOf: URL.init(fileURLWithPath: filePath), encoding: .ascii)
     }
 }
 

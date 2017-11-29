@@ -716,7 +716,7 @@
                                     <rect key="frame" x="1" y="1" width="795" height="541"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textView ambiguous="YES" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="kXh-3f-dzM">
+                                        <textView ambiguous="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" textCompletion="NO" smartInsertDelete="YES" id="kXh-3f-dzM">
                                             <rect key="frame" x="0.0" y="0.0" width="795" height="541"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -907,7 +907,7 @@
                     <connections>
                         <outlet property="bigN1" destination="rNh-9t-qcD" id="2mQ-TX-fDb"/>
                         <outlet property="bigN2" destination="WTD-ez-bWi" id="8Yl-5z-WpA"/>
-                        <outlet property="code" destination="kXh-3f-dzM" id="NsL-2T-5Md"/>
+                        <outlet property="code_textedit" destination="kXh-3f-dzM" id="NsL-2T-5Md"/>
                         <outlet property="f1" destination="2Lz-Ph-Mou" id="Vd9-eW-i9u"/>
                         <outlet property="f2" destination="11X-G8-qcX" id="xA2-qj-WYO"/>
                         <outlet property="n1" destination="urM-b2-SAu" id="Ghu-x7-f9C"/>
