@@ -25,11 +25,14 @@ func browseFile() -> String {
     return ""
 }
 
-let operatorsList = ["==",">=" ,"<=" ,"+=" ,"-=" ,"++","--", "!=", "[", "until", "=", ".open", ".each", ".now", ".chomp", "when", "if ", ".nil", "+", "-", "*", "/", "<", ">", ".upto", ".length", ".new", "and", "or ", ".call", "while", ".empty?", ".size", ".dup", ".push", ".pop", ".times", ".shuffle", ".write", "puts", "exit", "break", ".capitalize", ".now", ".open", "each_line", ".each_with_index", ".each_index", "break", "case", ".min", ".call", ".empty", "|", "{", "," , "%", "exit", "puts"]
+let operatorsList = ["==",">=" ,"<=" ,"+=" ,"-=" ,"++","--", "!=", "[", "until", "=", ".open", ".each", ".now", ".chomp", "when", "if ", ".nil", "+", "-", "*", "/", "<", ">", ".upto", ".length", ".new", "and", "or ", ".call", "while", ".empty?", ".size", ".dup", ".push", ".pop", ".times", ".shuffle", ".write", "puts", "exit", "break", ".capitalize", ".now", ".open", "each_line", ".each_with_index", ".each_index", "break", "case", ".min", ".call", ".empty", "|", "{", "," , "%", "exit", "puts", "begin", "?", "!", ]
 
-let blackList = ["]", "}", "def"]
+let blackList = ["]", "}", "def", "do", "class", "self", "File", "Time", "...", ".."]
 var findedOperators = [String:Int]()
 var findedOperands = [String:Int]()
+var numOperators = 0
+var numOperands = 0
+
 class ViewController: NSViewController {
     
     @IBOutlet weak var n1: NSTextField!
@@ -64,12 +67,14 @@ class ViewController: NSViewController {
             if lines[index].contains("\"") {
                 let quotesArray = lines[index].split(separator: "\"")
                 lines[index] = quotesArray[0]
-                let operand = String(quotesArray[1])
-                if findedOperands[operand] != nil {
-                    findedOperands[operand]! += 1
-                } else { findedOperands[operand] = 1 }
-                if quotesArray.count > 2 {
-                    lines[index] += quotesArray[2]
+                if quotesArray.count > 1 {
+                    let operand = String(quotesArray[1])
+                    if findedOperands[operand] != nil {
+                        findedOperands[operand]! += 1
+                    } else { findedOperands[operand] = 1 }
+                    if quotesArray.count > 2 {
+                        lines[index] += quotesArray[2]
+                    }
                 }
             }
             
@@ -88,12 +93,6 @@ class ViewController: NSViewController {
             code = code.replacingOccurrences(of: str, with: " ")
         }
         
-        // Handle function calls
-        let pat = "[a-zA-Z]+\\([^\\)]*\\)"
-        let regex = try! NSRegularExpression(pattern: pat, options: [])
-        let matches = regex.matches(in: code, options: [], range: NSRange(location: 0, length: code.count))
-        print(matches)
-        
 
         
         // Count operators
@@ -107,13 +106,18 @@ class ViewController: NSViewController {
             }
         }
         code_textedit.string = code
-        print(findedOperators)
-        print(findedOperands)
         
         // Count Operands
+        let variables = code.split(separator: "\n").joined(separator: " ").split(separator: " ")
+        for index in 0..<variables.count {
+            let operand = String(variables[index])
+            if findedOperands[operand] != nil {
+                findedOperands[operand]! += 1
+            } else { findedOperands[operand] = 1 }
+        }
         
-        
-        
+        print(findedOperators.description)
+        print(findedOperands.description)
         findedOperands.removeAll()
         findedOperators.removeAll()
     }
