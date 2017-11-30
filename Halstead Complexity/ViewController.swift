@@ -25,9 +25,9 @@ func browseFile() -> String {
     return ""
 }
 
-let operatorsList = ["==",">=" ,"<=" ,"+=" ,"-=" ,"++","--", "!=", "[", "until", "=", ".open", ".each", ".now", ".chomp", "when", "if ", ".nil", "+", "-", "*", "/", "<", ">", ".upto", ".length", ".new", "and", "or ", ".call", "while", ".empty?", ".size", ".dup", ".push", ".pop", ".times", ".shuffle", ".write", "puts", "exit", "break", ".capitalize", ".now", ".open", "each_line", ".each_with_index", ".each_index", "break", "case", ".min", ".call", ".empty", "|", "{", "," , "%", "exit", "puts", "begin", "?", "!",]
+let operatorsList = ["==",">=" ,"<=" ,"+=" ,"-=" ,"++","--", "!=", "[", "until", "=", ".open", ".each", ".now", ".chomp", "when", "if ", ".nil", "+", "-", "*", "/", "<", ">", ".upto", ".length", ".new", "and", "or ", ".call", "while", ".empty?", ".size", ".dup", ".push", ".pop", ".times", ".shuffle", ".write", "puts", "exit", "break", ".capitalize", ".now", ".open", "each_line", ".each_with_index", ".each_index", "break", "case", ".min", ".call", ".empty", "|", "{", "," , "%", "exit", "puts", "begin", "?", "!", "return"]
 
-let blackList = ["]", "}", "def", "do", "class", "self", "File", "Time", "...", ".."]
+let blackList = ["]", "}", "do", "class", "self", "File", "Time", "...", ".."]
 var findedOperators = [String:Int]()
 var findedOperands = [String:Int]()
 var numOperators = 0
@@ -55,9 +55,15 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         code_textedit.font = NSFont(name: "Courier New", size: 13)
     }
+
     
     @IBAction func Calculate(_ sender: Any) {
         code = code_textedit.string
+        
+        // Delete all black list crap
+        for str in blackList {
+            code = code.replacingOccurrences(of: str, with: " ")
+        }
         
         // Delete comments, handles functions and string in quotes
         var lines = code.split(separator: "\n")
@@ -67,6 +73,10 @@ class ViewController: NSViewController {
                 if hashArray.count > 1 {
                     lines[index] = hashArray[0]
                 } else { lines[index] = "" }
+            }
+            
+            if lines[index].contains("def") {
+                lines[index] = ""
             }
             
             if lines[index].contains("\"") {
@@ -84,41 +94,64 @@ class ViewController: NSViewController {
                 }
             }
             
-            if lines[index].contains("=") == false && lines[index].contains("(") {
-                var newline = lines[index].split(separator: "(").joined(separator: " ")
-                newline = newline.split(separator: ",").joined(separator: " ")
-                newline = newline.split(separator: ")").joined(separator: " ")
+            if lines[index].contains("(") {
+                var newline = String(lines[index])
+                var operand = ""
+                let parenthPos = Array(newline).index(of: "(")!
+                if Array(newline)[parenthPos - 1] != " " {
+                    var parenthArray = newline.split(separator: "(")
+                    if parenthArray[0].contains(" ") {
+                        let spacesArray = parenthArray[0].split(separator: " ")
+                        operand = String(spacesArray[spacesArray.count - 1])
+                        numOperators += 1
+                        if findedOperators[operand] != nil {
+                            findedOperators[operand]! += 1
+                        } else { findedOperators[operand] = 1 }
+                    } else {
+                        operand = String(parenthArray[0])
+                        numOperators += 1
+                        if findedOperators[operand] != nil {
+                            findedOperators[operand]! += 1
+                        } else { findedOperators[operand] = 1 }
+                    }
+                }
+                newline = newline.replacingOccurrences(of: operand, with: " ")
+                newline = newline.replacingOccurrences(of: "(", with: " ")
+                newline = newline.replacingOccurrences(of: ")", with: " ")
                 let newnewline = newline.split(separator: "≠")
                 lines[index] = newnewline[0]
             }
             
-            if lines[index].contains("=") && lines[index].contains("(") {
-                var newline = String(lines[index])
-                let parenthPos = Array(newline).index(of: "(")!
-                if Array(newline)[parenthPos - 1] != " " {
-                    newline = lines[index].split(separator: "(").joined(separator: " ")
-                    newline = newline.split(separator: ",").joined(separator: " ")
-                    newline = newline.split(separator: ")").joined(separator: " ")
-                    let newnewline = newline.split(separator: "≠")
-                    lines[index] = newnewline[0]
-                } else {
-                    var newline = lines[index].split(separator: "(").joined(separator: " ")
-                    newline = newline.split(separator: ")").joined(separator: " ")
-                    let newnewline = newline.split(separator: "≠")
-                    lines[index] = newnewline[0]
-                    numOperators += 1
-                    if findedOperators["(...)"] != nil {
-                        findedOperators["(...)"]! += 1
-                    } else { findedOperators["(...)"] = 1 }
-                }
-            }
+//            if lines[index].contains("=") == false && lines[index].contains("(") {
+//                var newline = lines[index].split(separator: "(").joined(separator: " ")
+//                newline = newline.split(separator: ",").joined(separator: " ")
+//                newline = newline.split(separator: ")").joined(separator: " ")
+//                let newnewline = newline.split(separator: "≠")
+//                lines[index] = newnewline[0]
+//            }
+//
+//            if lines[index].contains("=") && lines[index].contains("(") {
+//                var newline = String(lines[index])
+//                let parenthPos = Array(newline).index(of: "(")!
+//                if Array(newline)[parenthPos - 1] != " " {
+//                    newline = lines[index].split(separator: "(").joined(separator: " ")
+//                    newline = newline.split(separator: ",").joined(separator: " ")
+//                    newline = newline.split(separator: ")").joined(separator: " ")
+//                    let newnewline = newline.split(separator: "≠")
+//                    lines[index] = newnewline[0]
+//                } else {
+//                    var newline = lines[index].split(separator: "(").joined(separator: " ")
+//                    newline = newline.split(separator: ")").joined(separator: " ")
+//                    let newnewline = newline.split(separator: "≠")
+//                    lines[index] = newnewline[0]
+//                    numOperators += 1
+//                    if findedOperators["(...)"] != nil {
+//                        findedOperators["(...)"]! += 1
+//                    } else { findedOperators["(...)"] = 1 }
+//                }
+//            }
         }
         code = lines.joined(separator: "\n")
-        
-        // Delete all black list crap
-        for str in blackList {
-            code = code.replacingOccurrences(of: str, with: " ")
-        }
         
 
         
